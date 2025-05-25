@@ -5,173 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Name‑Card PDF Generator</title>
 
-  <!-- TailwindCSS (just for quick styling) -->
+  <!-- Tailwind – quick styling, no build step -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.4/dist/tailwind.min.css" rel="stylesheet" />
 
   <style>
-    /* Body padding so the form isn't glued to the edges on mobile */
-    body { padding-left: 4%; padding-right: 4%; }
-    /* Simple spinner */
-    .spinner { border: 2px solid #e5e7eb; border-top: 2px solid #2563eb; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: top; margin-top: 3px; }
-    @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+    body{padding-left:4%;padding-right:4%}
+    .spinner{border:2px solid #e5e7eb;border-top:2px solid #2563eb;border-radius:50%;width:16px;height:16px;animation:spin 1s linear infinite;display:inline-block;vertical-align:top;margin-top:3px}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
-
   <h1 class="text-3xl font-bold mb-6 text-center">Name‑Card PDF Generator</h1>
 
-  <form id="generatorForm" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
+  <form id="gen" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
+    <!-- BASIC -->
+    <label class="block"><span class="text-gray-700">Group / Ward label</span><input id="ward" type="text" class="mt-1 p-2 w-full rounded-md border-gray-300" value="Provo YSA 19th Ward" required></label>
+    <label class="block"><span class="text-gray-700">Roster CSV (Last,First)</span><input id="roster" type="file" accept=".csv" class="mt-1 w-full" required></label>
+    <label class="block"><span class="text-gray-700">Output filename</span><input id="outfile" type="text" value="name_cards.pdf" class="mt-1 p-2 w-full rounded-md border-gray-300" required></label>
 
-    <!-- ── BASIC SETTINGS ──────────────────────────────────────────────── -->
-    <label class="block">
-      <span class="text-gray-700">Group / Ward name (corner label)</span>
-      <input id="groupName" type="text" class="mt-1 p-2 block w-full rounded-md border-gray-300" value="Provo YSA 19th Ward" required />
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">Roster file (CSV, <em>LastName,FirstName</em>)</span>
-      <input id="csvInput" type="file" accept=".csv" class="mt-1 block w-full" required />
-    </label>
-
-    <label class="block">
-      <span class="text-gray-700">Output PDF filename</span>
-      <input id="pdfName" type="text" class="mt-1 p-2 block w-full rounded-md border-gray-300" value="name_cards.pdf" required />
-    </label>
-
-    <!-- ── ADVANCED OPTIONS ────────────────────────────────────────────── -->
-    <details class="w-full">
-      <summary class="cursor-pointer font-medium">Advanced layout options <span class="text-sm text-gray-500">(optional)</span></summary>
+    <!-- ADVANCED -->
+    <details><summary class="cursor-pointer font-medium">Advanced layout</summary>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-        <label class="block"><span class="text-gray-700">Page width&nbsp;(cm)</span><input id="pageW" type="number" min="1" step="0.1" value="29.7" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
-        <label class="block"><span class="text-gray-700">Page height&nbsp;(cm)</span><input id="pageH" type="number" min="1" step="0.1" value="21" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
-        <label class="block"><span class="text-gray-700">Card width&nbsp;(cm)</span><input id="cardW" type="number" min="1" step="0.1" value="7.5" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
-        <label class="block"><span class="text-gray-700">Card height&nbsp;(cm)</span><input id="cardH" type="number" min="1" step="0.1" value="10" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
-        <label class="block"><span class="text-gray-700">First‑name max font&nbsp;(pt)</span><input id="fontMax" type="number" min="1" value="100" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
-        <label class="block"><span class="text-gray-700">First‑name min font&nbsp;(pt)</span><input id="fontMin" type="number" min="1" value="60" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
-        <label class="block"><span class="text-gray-700">Small‑text font&nbsp;(pt)</span><input id="fontSmall" type="number" min="1" value="16" class="mt-1 p-1 block w-full rounded-md border-gray-300" /></label>
+        <label><span class="text-gray-700">Page W (cm)</span><input id="pw" type="number" step="0.1" value="29.7" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Page H (cm)</span><input id="ph" type="number" step="0.1" value="21"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Card W (cm)</span><input id="cw" type="number" step="0.1" value="7.5"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Card H (cm)</span><input id="ch" type="number" step="0.1" value="10"   class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">First‑name max pt</span><input id="fmax" type="number" value="100" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">First‑name min pt</span><input id="fmin" type="number" value="60"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Small‑text pt</span><input id="fsmall" type="number" value="16" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
       </div>
     </details>
 
-    <!-- ── ACTIONS ─────────────────────────────────────────────────────── -->
-    <div class="flex items-center gap-4">
-      <button id="generateBtn" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition">Generate PDF</button>
-      <span id="status" class="text-sm text-gray-500"></span>
-    </div>
-
-    <a id="downloadLink" class="hidden text-blue-600 underline mt-2">Download PDF</a>
+    <!-- ACTIONS -->
+    <div class="flex items-center gap-4"><button id="go" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition">Generate PDF</button><span id="msg" class="text-sm text-gray-500"></span></div>
+    <a id="dl" class="hidden text-blue-600 underline mt-2">Download PDF</a>
   </form>
 
-  <!-- ── LIBRARIES ─────────────────────────────────────────────────────── -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js?v=1"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js?v=1"></script>
+  <!-- LIBRARIES (deferred so they load before main) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/dist/papaparse.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
 
-  <!-- ── MAIN SCRIPT ───────────────────────────────────────────────────── -->
-  <script>
-    /* Utility */
-    const CM = 28.3464567; // points per cm
-    const cm = v => v * CM;
+  <!-- MAIN – defer ensures it runs after libs -->
+  <script defer>
+    const CM=28.3464567, cm=v=>v*CM;
+    const form=document.getElementById('gen');
+    const go=document.getElementById('go'), msg=document.getElementById('msg'), dl=document.getElementById('dl');
 
-    const form   = document.getElementById('generatorForm');
-    const btn    = document.getElementById('generateBtn');
-    const status = document.getElementById('status');
-    const link   = document.getElementById('downloadLink');
+    function fit(font,text,maxW,maxS,minS){let s=maxS;while(s>=minS&&font.widthOfTextAtSize(text,s)>maxW)s--;return Math.max(s,minS);}
 
-    /* Resize helper for first name */
-    function fitName(font, text, maxWidth, maxSize, minSize) {
-      let s = maxSize;
-      while (s >= minSize && font.widthOfTextAtSize(text, s) > maxWidth) s--;
-      return Math.max(s, minSize);
-    }
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      go.disabled=true;dl.classList.add('hidden');msg.innerHTML='<span class="spinner"></span> Generating…';
 
-    /* Main handler */
-    form.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      btn.disabled = true;
-      link.classList.add('hidden');
-      status.innerHTML = '<span class="spinner"></span> Generating…';
+      try{
+        /* Ensure libs loaded */
+        if(!window.Papa) throw new Error('PapaParse failed to load. Check network or CDN blocking.');
+        if(!window.PDFLib) throw new Error('pdf-lib failed to load.');
 
-      try {
-        /* Gather user input */
-        const val = id => document.getElementById(id).value.trim();
-        const ward  = val('groupName');
-        const pdfName = (val('pdfName').replace(/\.pdf$/i, '') || 'name_cards') + '.pdf';
-        const pageW = +val('pageW'), pageH = +val('pageH');
-        const cardW = +val('cardW'), cardH = +val('cardH');
-        const fMax  = +val('fontMax'), fMin = +val('fontMin'), fSmall = +val('fontSmall');
+        const v=id=>document.getElementById(id).value.trim();
+        const ward=v('ward');
+        const pdfName=(v('outfile').replace(/\.pdf$/i,'')||'name_cards')+'.pdf';
+        const pw=+v('pw'),ph=+v('ph'),cw=+v('cw'),ch=+v('ch');
+        const fmax=+v('fmax'),fmin=+v('fmin'),fsmall=+v('fsmall');
 
-        /* Read CSV */
-        const file = document.getElementById('csvInput').files[0];
-        if (!file) throw new Error('Please choose a CSV file.');
+        const file=document.getElementById('roster').files[0];
+        if(!file)throw new Error('Please choose a CSV file.');
 
-        const rows = await new Promise(res => {
-          Papa.parse(file, {
-            skipEmptyLines: true,
-            complete: r => res(r.data)
-          });
-        });
+        const rows=await new Promise(res=>Papa.parse(file,{skipEmptyLines:true,complete:r=>res(r.data)}));
+        const names=rows.map(r=>({first:(r[1]||'').trim(),last:(r[0]||'').trim()})).filter(n=>n.first&&n.last);
+        if(!names.length)throw new Error('CSV appears empty or not "Last,First" format.');
 
-        const names = rows.map(r => ({ first: (r[1] || '').trim(), last: (r[0] || '').trim() }))
-                          .filter(n => n.first && n.last);
-        if (!names.length) throw new Error('CSV is empty or not in Last,First order.');
+        const {PDFDocument,rgb,StandardFonts}=PDFLib;const pdf=await PDFDocument.create();
+        const font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+        const pW=cm(pw),pH=cm(ph),cW=cm(cw),cH=cm(ch);const cols=2,rows=2,per=cols*rows;
 
-        /* Build PDF with pdf-lib */
-        const { PDFDocument, rgb, StandardFonts } = PDFLib;
-        const pdf   = await PDFDocument.create();
-        const font  = await pdf.embedFont(StandardFonts.Helvetica);
-        const bold  = await pdf.embedFont(StandardFonts.HelveticaBold);
+        names.forEach((n,i)=>{if(i%per===0)pdf.addPage([pW,pH]);const pg=pdf.getPage(pdf.getPageCount()-1);
+          const idx=i%per,col=idx%cols,row=Math.floor(idx/cols);const ox=col*cW,oy=pH-(row+1)*cH;
+          pg.drawRectangle({x:ox,y:oy,width:cW,height:cH,borderWidth:1.5,borderColor:rgb(0,0,0),borderDashArray:[4,3],color:rgb(1,1,1),opacity:0});
+          pg.drawText(ward,{x:ox+cm(.5),y:oy+cH-cm(.5)-10,size:10,font});
+          const size=fit(bold,n.first,cm(cw-2),fmax,fmin);
+          pg.drawText(n.first,{x:ox+cW/2-bold.widthOfTextAtSize(n.first,size)/2,y:oy+cH/1.7-size/2,size,font:bold});
+          const full=`${n.first} ${n.last}`;
+          pg.drawText(full,{x:ox+cW/2-font.widthOfTextAtSize(full,fsmall)/2,y:oy+cH/4-fsmall/2,size:fsmall,font});});
 
-        const pW = cm(pageW), pH = cm(pageH), cW = cm(cardW), cH = cm(cardH);
-        const cols = 2, rowsPer = 2, perPage = cols * rowsPer;
-
-        names.forEach((n, i) => {
-          if (i % perPage === 0) pdf.addPage([pW, pH]);
-          const pg   = pdf.getPage(pdf.getPageCount() - 1);
-          const pos  = i % perPage, col = pos % cols, row = Math.floor(pos / cols);
-          const ox   = col * cW, oy = pH - (row + 1) * cH;
-
-          /* Outline */
-          pg.drawRectangle({ x: ox, y: oy, width: cW, height: cH,
-                             borderWidth: 1.5, borderColor: rgb(0, 0, 0),
-                             borderDashArray: [4, 3], color: rgb(1, 1, 1), opacity: 0 });
-
-          /* Corner label */
-          pg.drawText(ward, { x: ox + cm(0.5), y: oy + cH - cm(0.5) - 10, size: 10, font });
-
-          /* First name auto‑size */
-          const maxW = cm(cardW - 2); // 1 cm margin each side
-          const size = fitName(bold, n.first, maxW, fMax, fMin);
-          pg.drawText(n.first, {
-            x: ox + cW / 2 - bold.widthOfTextAtSize(n.first, size) / 2,
-            y: oy + cH / 1.7 - size / 2,
-            size, font: bold
-          });
-
-          /* Full name */
-          const full = `${n.first} ${n.last}`;
-          pg.drawText(full, {
-            x: ox + cW / 2 - font.widthOfTextAtSize(full, fSmall) / 2,
-            y: oy + cH / 4 - fSmall / 2,
-            size: fSmall, font
-          });
-        });
-
-        /* Prepare blob & link */
-        const blob = new Blob([await pdf.save()], { type: 'application/pdf' });
-        link.href = URL.createObjectURL(blob);
-        link.download = pdfName;
-        link.textContent = `Download ${pdfName}`;
-        link.classList.remove('hidden');
-
-        /* Auto‑trigger download; if blocked, user still sees link */
-        setTimeout(() => { try { link.click(); } catch (_) {} }, 50);
-        status.textContent = 'Ready!';
-      } catch (err) {
-        console.error(err);
-        alert(err.message || 'Unexpected error');
-        status.textContent = '';
-      } finally {
-        btn.disabled = false;
-      }
+        const blob=new Blob([await pdf.save()],{type:'application/pdf'});
+        dl.href=URL.createObjectURL(blob);dl.download=pdfName;dl.textContent=`Download ${pdfName}`;dl.classList.remove('hidden');
+        setTimeout(()=>{try{dl.click()}catch{}});
+        msg.textContent='Ready!';
+      }catch(err){console.error(err);alert(err.message);msg.textContent='';}
+      finally{go.disabled=false;}
     });
   </script>
 </body>
