@@ -7,7 +7,6 @@
 
   <!-- Tailwind for quick styling -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.4/dist/tailwind.min.css" rel="stylesheet" />
-
   <style>
     body{padding:4%}
     .spinner{border:2px solid #e5e7eb;border-top:2px solid #2563eb;border-radius:50%;width:16px;height:16px;animation:spin 1s linear infinite;display:inline-block;margin-top:3px}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
@@ -18,19 +17,19 @@
 
   <form id="gen" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
     <!-- BASIC -->
-    <label class="block"><span class="text-gray-700">Group / Ward label</span><input id="ward" type="text" class="mt-1 p-2 w-full rounded-md border-gray-300" value="Provo YSA 19th Ward" required></label>
+    <label class="block"><span class="text-gray-700">Group / Ward label</span><input id="ward" type="text" class="mt-1 p-2 w-full rounded-md border-gray-300" value="Provo YSA 19th Ward" required></label>
     <label class="block"><span class="text-gray-700">Roster CSV (Last,First)</span><input id="roster" type="file" accept=".csv" class="mt-1 w-full" required></label>
     <label class="block"><span class="text-gray-700">Output filename</span><input id="outfile" type="text" value="name_cards.pdf" class="mt-1 p-2 w-full rounded-md border-gray-300" required></label>
 
     <!-- ADVANCED -->
     <details><summary class="cursor-pointer font-medium">Advanced layout</summary>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-        <label><span class="text-gray-700">Page W (cm)</span><input id="pw" type="number" step="0.1" value="29.7" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
-        <label><span class="text-gray-700">Page H (cm)</span><input id="ph" type="number" step="0.1" value="21"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
-        <label><span class="text-gray-700">Card W (cm)</span><input id="cw" type="number" step="0.1" value="7.5"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
-        <label><span class="text-gray-700">Card H (cm)</span><input id="ch" type="number" step="0.1" value="10"   class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
-        <label><span class="text-gray-700">First‑name max pt</span><input id="fmax" type="number" value="100" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
-        <label><span class="text-gray-700">First‑name min pt</span><input id="fmin" type="number" value="60"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Page W (cm)</span><input id="pw" type="number" step="0.1" value="29.7" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Page H (cm)</span><input id="ph" type="number" step="0.1" value="21"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Card W (cm)</span><input id="cw" type="number" step="0.1" value="7.5"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">Card H (cm)</span><input id="ch" type="number" step="0.1" value="10"   class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">First‑name max pt</span><input id="fmax" type="number" value="100" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
+        <label><span class="text-gray-700">First‑name min pt</span><input id="fmin" type="number" value="60"  class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
         <label><span class="text-gray-700">Small‑text pt</span><input id="fsmall" type="number" value="16" class="mt-1 p-1 w-full rounded-md border-gray-300"></label>
       </div>
     </details>
@@ -40,59 +39,66 @@
     <a id="dl" class="hidden text-blue-600 underline mt-2">Download PDF</a>
   </form>
 
-  <!-- LIBRARIES (primary → fallback) -------------------------------------- -->
+  <!-- LIBRARIES (primary then fallback) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js"></script>
-  <script>if(typeof Papa==='undefined'){console.warn('jsDelivr blocked – loading PapaParse from unpkg');document.write('<script src="https://unpkg.com/papaparse@5.4.3/papaparse.min.js"><\/script>');}</script>
-
+  <script>if(typeof Papa==='undefined'){document.write('<script src="https://unpkg.com/papaparse@5.4.3/papaparse.min.js"><\/script>')}</script>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script>if(typeof PDFLib==='undefined'){console.warn('jsDelivr blocked – loading pdf-lib from unpkg');document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
+  <script>if(typeof PDFLib==='undefined'){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>')}</script>
 
-  <!-- MAIN SCRIPT --------------------------------------------------------- -->
+  <!-- MAIN SCRIPT -->
   <script>
     const CM=28.3464567, cm=v=>v*CM;
-    const form=document.getElementById('gen'), go=document.getElementById('go'), msg=document.getElementById('msg'), dl=document.getElementById('dl');
+    const form=document.getElementById('gen');
+    const go=document.getElementById('go'), msg=document.getElementById('msg'), dl=document.getElementById('dl');
 
     function fit(font,text,maxW,maxS,minS){let s=maxS;while(s>=minS&&font.widthOfTextAtSize(text,s)>maxW)s--;return Math.max(s,minS);}
 
-    form.addEventListener('submit',async e=>{
-      e.preventDefault();
+    form.addEventListener('submit',async ev=>{
+      ev.preventDefault();
       go.disabled=true;dl.classList.add('hidden');msg.innerHTML='<span class="spinner"></span> Generating…';
 
       try{
-        /* libs ready? */
-        if(!window.Papa) throw new Error('PapaParse still missing – network may block all CDNs.');
-        if(!window.PDFLib) throw new Error('pdf-lib still missing – network may block all CDNs.');
+        if(!window.Papa) throw new Error('PapaParse missing – network blocking CDNs.');
+        if(!window.PDFLib) throw new Error('pdf-lib missing – network blocking CDNs.');
 
-        const v=id=>document.getElementById(id).value.trim();
-        const ward=v('ward');
-        const pdfName=(v('outfile').replace(/\.pdf$/i,'')||'name_cards')+'.pdf';
-        const pw=+v('pw'),ph=+v('ph'),cw=+v('cw'),ch=+v('ch');
-        const fmax=+v('fmax'),fmin=+v('fmin'),fsmall=+v('fsmall');
+        const val=id=>document.getElementById(id).value.trim();
+        const ward=val('ward');
+        const pdfName=(val('outfile').replace(/\.pdf$/i,'')||'name_cards')+'.pdf';
+        const pageW=+val('pw'),pageH=+val('ph'),cardW=+val('cw'),cardH=+val('ch');
+        const fMax=+val('fmax'),fMin=+val('fmin'),fSmall=+val('fsmall');
 
         const file=document.getElementById('roster').files[0];
-        if(!file)throw new Error('Please choose a CSV file.');
+        if(!file) throw new Error('Choose a CSV file.');
 
-        const rows=await new Promise(res=>Papa.parse(file,{skipEmptyLines:true,complete:r=>res(r.data)}));
-        const names=rows.map(r=>({first:(r[1]||'').trim(),last:(r[0]||'').trim()})).filter(n=>n.first&&n.last);
-        if(!names.length)throw new Error('CSV appears empty or not "Last,First" format.');
+        const csvRows=await new Promise(res=>Papa.parse(file,{skipEmptyLines:true,complete:r=>res(r.data)}));
+        const people=csvRows.map(r=>({first:(r[1]||'').trim(),last:(r[0]||'').trim()})).filter(n=>n.first&&n.last);
+        if(!people.length) throw new Error('CSV has no valid "Last,First" rows.');
 
-        const {PDFDocument,rgb,StandardFonts}=PDFLib;const pdf=await PDFDocument.create();
+        const {PDFDocument,rgb,StandardFonts}=PDFLib;
+        const pdf=await PDFDocument.create();
         const font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
-        const pW=cm(pw),pH=cm(ph),cW=cm(cw),cH=cm(ch);const cols=2,rows=2,per=cols*rows;
 
-        names.forEach((n,i)=>{if(i%per===0)pdf.addPage([pW,pH]);const pg=pdf.getPage(pdf.getPageCount()-1);
-          const idx=i%per,col=idx%cols,row=Math.floor(idx/cols),ox=col*cW,oy=pH-(row+1)*cH;
+        const pW=cm(pageW),pH=cm(pageH),cW=cm(cardW),cH=cm(cardH);
+        const cols=2,pageRows=2,cardsPerPage=cols*pageRows;
+
+        people.forEach((p,i)=>{
+          if(i%cardsPerPage===0) pdf.addPage([pW,pH]);
+          const pg=pdf.getPage(pdf.getPageCount()-1);
+          const slot=i%cardsPerPage,col=slot%cols,row=Math.floor(slot/cols);
+          const ox=col*cW,oy=pH-(row+1)*cH;
           pg.drawRectangle({x:ox,y:oy,width:cW,height:cH,borderWidth:1.5,borderColor:rgb(0,0,0),borderDashArray:[4,3],color:rgb(1,1,1),opacity:0});
           pg.drawText(ward,{x:ox+cm(.5),y:oy+cH-cm(.5)-10,size:10,font});
-          const size=fit(bold,n.first,cm(cw-2),fmax,fmin);
-          pg.drawText(n.first,{x:ox+cW/2-bold.widthOfTextAtSize(n.first,size)/2,y:oy+cH/1.7-size/2,size,font:bold});
-          const full=`${n.first} ${n.last}`;
-          pg.drawText(full,{x:ox+cW/2-font.widthOfTextAtSize(full,fsmall)/2,y:oy+cH/4-fsmall/2,size:fsmall,font});});
+          const size=fit(bold,p.first,cm(cardW-2),fMax,fMin);
+          pg.drawText(p.first,{x:ox+cW/2-bold.widthOfTextAtSize(p.first,size)/2,y:oy+cH/1.7-size/2,size,font:bold});
+          const full=`${p.first} ${p.last}`;
+          pg.drawText(full,{x:ox+cW/2-font.widthOfTextAtSize(full,fSmall)/2,y:oy+cH/4-fSmall/2,size:fSmall,font});
+        });
 
         const blob=new Blob([await pdf.save()],{type:'application/pdf'});
         dl.href=URL.createObjectURL(blob);dl.download=pdfName;dl.textContent=`Download ${pdfName}`;dl.classList.remove('hidden');
         setTimeout(()=>{try{dl.click()}catch{}});
         msg.textContent='Ready!';
+
       }catch(err){console.error(err);alert(err.message);msg.textContent='';}
       finally{go.disabled=false;}
     });
