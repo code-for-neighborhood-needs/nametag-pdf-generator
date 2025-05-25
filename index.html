@@ -66,22 +66,9 @@
     <a id="downloadLink" class="hidden text-blue-600 underline mt-2"></a>
   </form>
 
-  <!-- Libraries with fallback -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js"></script>
-  <script>
-    if (typeof Papa === 'undefined') {
-      console.warn('jsDelivr blocked – loading PapaParse from unpkg');
-      document.write("<script src='https://unpkg.com/papaparse@5.4.3/papaparse.min.js'><\/script>");
-    }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script>
-    if (typeof PDFLib === 'undefined') {
-      console.warn('jsDelivr blocked – loading pdf-lib from unpkg');
-      document.write("<script src='https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js'><\/script>");
-    }
-  </script>
+  <!-- Local bundled libraries -->
+  <script src="js/papaparse.min.js"></script>
+  <script src="js/pdf-lib.min.js"></script>
 
   <!-- Main script -->
   <script>
@@ -108,8 +95,8 @@
       status.innerHTML = '<span class="spinner"></span> Generating…';
 
       try {
-        if (!window.Papa) throw new Error('PapaParse missing – network may be blocking CDNs.');
-        if (!window.PDFLib) throw new Error('pdf-lib missing – network may be blocking CDNs.');
+        if (!window.Papa) throw new Error('PapaParse library missing.');
+        if (!window.PDFLib) throw new Error('pdf-lib library missing.');
 
         const v = id => document.getElementById(id).value.trim();
         const ward = v('wardLabel');
