@@ -150,7 +150,10 @@
 
               // first name auto-sized
               const maxTextW = cm(cardW - 2);
-              const nameSize = autoSize(bold, person.first, maxTextW, maxFont, minFont);
+              let nameSize = autoSize(bold, person.first, maxTextW, maxFont, minFont);
+              // enforce vertical limit: max 40% of card height
+              const heightLimit = cHpts * 0.4;
+              if (nameSize > heightLimit) nameSize = Math.floor(heightLimit);
               page.drawText(person.first, {
                 x: ox + cWpts / 2 - bold.widthOfTextAtSize(person.first, nameSize) / 2,
                 y: oy + cHpts / 1.7 - nameSize / 2,
