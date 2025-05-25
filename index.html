@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Name‑Card PDF Generator</title>
+  <title>Name-Card PDF Generator</title>
 
   <!-- Tailwind for styling -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.4/dist/tailwind.min.css" rel="stylesheet"/>
@@ -13,53 +13,89 @@
       border: 2px solid #e5e7eb;
       border-top: 2px solid #2563eb;
       border-radius: 50%;
-      width: 16px;
-      height: 16px;
+      width: 16px; height: 16px;
       animation: spin 1s linear infinite;
-      display: inline-block;
-      margin-top: 3px;
+      display: inline-block; margin-top: 3px;
     }
-    @keyframes spin { 0% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
+    @keyframes spin { 0% { transform: rotate(0) } 100% { transform: rotate(360deg) } }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
 
-  <h1 class="text-3xl font-bold mb-6 text-center">Name‑Card PDF Generator</h1>
+  <h1 class="text-3xl font-bold mb-6 text-center">Name-Card PDF Generator</h1>
 
   <form id="genForm" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
     <!-- Basic Settings -->
     <label class="block">
       <span class="text-gray-700">Group / Ward label</span>
-      <input id="wardLabel" type="text" class="mt-1 p-2 w-full rounded-md border-gray-300" value="Provo YSA 19th Ward" required />
+      <input id="wardLabel" type="text"
+             class="mt-1 p-2 w-full rounded-md border-gray-300"
+             value="Provo YSA 19th Ward" required />
     </label>
 
     <label class="block">
       <span class="text-gray-700">Roster CSV (Last,First)</span>
-      <input id="csvFile" type="file" accept=".csv" class="mt-1 w-full" required />
+      <input id="csvFile" type="file" accept=".csv"
+             class="mt-1 w-full" required />
     </label>
 
     <label class="block">
       <span class="text-gray-700">Output filename</span>
-      <input id="outputName" type="text" value="name_cards.pdf" class="mt-1 p-2 w-full rounded-md border-gray-300" required />
+      <input id="outputName" type="text"
+             value="name_cards.pdf"
+             class="mt-1 p-2 w-full rounded-md border-gray-300"
+             required />
     </label>
 
     <!-- Advanced Options -->
     <details>
       <summary class="cursor-pointer font-medium">Advanced layout</summary>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-        <label><span class="text-gray-700">Page width (cm)</span><input id="pageW" type="number" step="0.1" value="29.7" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
-        <label><span class="text-gray-700">Page height (cm)</span><input id="pageH" type="number" step="0.1" value="21" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
-        <label><span class="text-gray-700">Card width (cm)</span><input id="cardW" type="number" step="0.1" value="10" class="mt-1 p-1 w-full rounded-md border-gray-300" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
-        <label><span class="text-gray-700">Card height (cm)</span><input id="cardH" type="number" step="0.1" value="7.5" class="mt-1 p-1 w-full rounded-md border-gray-300" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
-        <label><span class="text-gray-700">First-name max font (pt)</span><input id="maxFont" type="number" value="100" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
-        <label><span class="text-gray-700">First-name min font (pt)</span><input id="minFont" type="number" value="60" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
-        <label><span class="text-gray-700">Small-text font (pt)</span><input id="smallFont" type="number" value="16" class="mt-1 p-1 w-full rounded-md border-gray-300" /></label>
+        <label>
+          <span class="text-gray-700">Page width (cm)</span>
+          <input id="pageW" type="number" step="0.1" value="29.7"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">Page height (cm)</span>
+          <input id="pageH" type="number" step="0.1" value="21"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">Card width (cm)</span>
+          <input id="cardW" type="number" step="0.1" value="10"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">Card height (cm)</span>
+          <input id="cardH" type="number" step="0.1" value="7.5"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">First-name max font (pt)</span>
+          <input id="maxFont" type="number" value="100"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">First-name min font (pt)</span>
+          <input id="minFont" type="number" value="60"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">Small-text font (pt)</span>
+          <input id="smallFont" type="number" value="16"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
       </div>
     </details>
 
     <!-- Actions -->
     <div class="flex items-center gap-4">
-      <button id="generateBtn" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition">Generate PDF</button>
+      <button id="generateBtn" type="submit"
+              class="px-4 py-2 bg-blue-600 text-white
+                     rounded-lg hover:bg-blue-700 disabled:bg-blue-300">
+        Generate PDF
+      </button>
       <span id="statusMsg" class="text-sm text-gray-500"></span>
     </div>
 
@@ -71,130 +107,127 @@
   <script src="js/pdf-lib.min.js"></script>
 
   <!-- Main script -->
-<script>
-  const CM_TO_PT = 28.3464567;
-  const cm = v => v * CM_TO_PT;
+  <script>
+    const CM_TO_PT = 28.3464567;
+    const cm = v => v * CM_TO_PT;
 
-  const form = document.getElementById('genForm');
-  const genBtn = document.getElementById('generateBtn');
-  const status = document.getElementById('statusMsg');
-  const dlLink = document.getElementById('downloadLink');
+    const form = document.getElementById('genForm');
+    const genBtn = document.getElementById('generateBtn');
+    const status = document.getElementById('statusMsg');
+    const dlLink = document.getElementById('downloadLink');
 
-  function autoSize(font, text, maxWidth, maxSize, minSize) {
-    let size = maxSize;
-    while (size >= minSize && font.widthOfTextAtSize(text, size) > maxWidth) {
-      size--;
+    function autoSize(font, text, maxWidth, maxSize, minSize) {
+      let size = maxSize;
+      while (size >= minSize && font.widthOfTextAtSize(text, size) > maxWidth) {
+        size--;
+      }
+      return Math.max(size, minSize);
     }
-    return Math.max(size, minSize);
-  }
 
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    genBtn.disabled = true;
-    dlLink.classList.add('hidden');
-    status.innerHTML = '<span class="spinner"></span> Generating…';
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      genBtn.disabled = true;
+      dlLink.classList.add('hidden');
+      status.innerHTML = '<span class="spinner"></span> Generating…';
 
-    try {
-      if (!window.Papa) throw new Error('PapaParse library missing.');
-      if (!window.PDFLib) throw new Error('pdf-lib library missing.');
+      try {
+        if (!window.Papa)   throw new Error('PapaParse library missing.');
+        if (!window.PDFLib) throw new Error('pdf-lib library missing.');
 
-      const v = id => document.getElementById(id).value.trim();
-      const ward = v('wardLabel');
-      const outputName = (v('outputName').replace(/\.pdf$/i, '') || 'name_cards') + '.pdf';
+        const v = id => document.getElementById(id).value.trim();
+        const ward = v('wardLabel');
+        const outputName = (v('outputName').replace(/\.pdf$/i,'') || 'name_cards') + '.pdf';
 
-      const pageW = +v('pageW'), pageH = +v('pageH');
-      const cardW = +v('cardW'), cardH = +v('cardH');
-      const maxFont = +v('maxFont'), minFont = +v('minFont'), smallFont = +v('smallFont');
+        const pageW = +v('pageW'), pageH = +v('pageH');
+        const cardW = +v('cardW'), cardH = +v('cardH');
+        const maxFont = +v('maxFont'), minFont = +v('minFont'), smallFont = +v('smallFont');
 
-      const file = document.getElementById('csvFile').files[0];
-      if (!file) throw new Error('Please choose a CSV file.');
+        const file = document.getElementById('csvFile').files[0];
+        if (!file) throw new Error('Please choose a CSV file.');
 
-      const csvRows = await new Promise(res => Papa.parse(file, { skipEmptyLines: true, complete: r => res(r.data) }));
-      const people = csvRows
-        .map(r => ({ first: (r[1] || '').trim(), last: (r[0] || '').trim() }))
-        .filter(p => p.first && p.last);
-      if (!people.length) throw new Error('CSV has no valid "Last,First" rows.');
+        const csvRows = await new Promise(res =>
+          Papa.parse(file, { skipEmptyLines: true, complete: r => res(r.data) })
+        );
+        const people = csvRows
+          .map(r => ({ first: (r[1]||'').trim(), last: (r[0]||'').trim() }))
+          .filter(p => p.first && p.last);
+        if (!people.length) throw new Error('CSV has no valid "Last,First" rows.');
 
-      const { PDFDocument, rgb, StandardFonts } = PDFLib;
-      const pdfDoc = await PDFDocument.create();
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        const pdfDoc = await PDFDocument.create();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-      const ptsW = cm(pageW), ptsH = cm(pageH);
-      const cWpts = cm(cardW), cHpts = cm(cardH);
-      const columns = 2;
-      const rowsPerPage = 2;
-      const cardsPerPage = columns * rowsPerPage;
-      const totalPages = Math.ceil(people.length / cardsPerPage);
+        const ptsW = cm(pageW), ptsH = cm(pageH);
+        const cWpts = cm(cardW), cHpts = cm(cardH);
+        const columns = 2, rowsPerPage = 2, cardsPerPage = columns * rowsPerPage;
+        const totalPages = Math.ceil(people.length / cardsPerPage);
 
-      for (let p = 0; p < totalPages; p++) {
-        pdfDoc.addPage([ptsW, ptsH]);
-        const page = pdfDoc.getPage(p);
+        for (let p = 0; p < totalPages; p++) {
+          pdfDoc.addPage([ptsW, ptsH]);
+          const page = pdfDoc.getPage(p);
 
-        for (let r = 0; r < rowsPerPage; r++) {
-          for (let c = 0; c < columns; c++) {
-            const idx = p * cardsPerPage + r * columns + c;
-            const ox = c * cWpts;
-            const oy = ptsH - (r + 1) * cHpts;
+          for (let r = 0; r < rowsPerPage; r++) {
+            for (let c = 0; c < columns; c++) {
+              const idx = p * cardsPerPage + r * columns + c;
+              const ox = c * cWpts;
+              const oy = ptsH - (r+1) * cHpts;
 
-            // draw outline for every cell
-            page.drawRectangle({ x: ox, y: oy, width: cWpts, height: cHpts,
-              borderWidth: 1.5, borderColor: rgb(0, 0, 0), borderDashArray: [4, 3],
-              color: rgb(1, 1, 1), opacity: 0 });
-
-            if (idx < people.length) {
-              const person = people[idx];
-
-              // ward label
-              page.drawText(ward, { x: ox + cm(0.5), y: oy + cHpts - cm(0.5) - 10, size: 10, font });
-
-              // first name auto-sized
-              // auto-size with both width and height caps
-const maxTextW = cm(cardW - 2);
-let nameSize = maxFont;
-const heightCap = cHpts * 0.4;
-while (nameSize >= minFont) {
-  const widthFits = bold.widthOfTextAtSize(person.first, nameSize) <= maxTextW;
-  const heightFits = nameSize <= heightCap;
-  if (widthFits && heightFits) break;
-  nameSize--;
-}
-if (nameSize < minFont) nameSize = minFont;
-page.drawText(person.first")]}, {
-                x: ox + cWpts / 2 - bold.widthOfTextAtSize(person.first, nameSize) / 2,
-                y: oy + cHpts / 1.7 - nameSize / 2,
-                size: nameSize,
-                font: bold
+              // outline
+              page.drawRectangle({
+                x: ox, y: oy, width: cWpts, height: cHpts,
+                borderWidth:1.5, borderColor: rgb(0,0,0),
+                borderDashArray:[4,3], color:rgb(1,1,1), opacity:0
               });
 
-              // full name
-              const full = `${person.first} ${person.last}`;
-              page.drawText(full, {
-                x: ox + cWpts / 2 - font.widthOfTextAtSize(full, smallFont) / 2,
-                y: oy + cHpts / 4 - smallFont / 2,
-                size: smallFont,
-                font
-              });
+              if (idx < people.length) {
+                const person = people[idx];
+
+                page.drawText(ward, {
+                  x: ox+cm(0.5), y: oy+cHpts-cm(0.5)-10,
+                  size:10, font
+                });
+
+                // auto-size & cap at 40% of card height
+                const maxTextW = cm(cardW - 2);
+                let nameSize = autoSize(bold, person.first, maxTextW, maxFont, minFont);
+                const heightCap = cHpts * 0.4;
+                if (nameSize > heightCap) nameSize = Math.floor(heightCap);
+
+                page.drawText(person.first, {
+                  x: ox + cWpts/2 - bold.widthOfTextAtSize(person.first,nameSize)/2,
+                  y: oy + cHpts/1.7 - nameSize/2,
+                  size: nameSize, font: bold
+                });
+
+                const full = `${person.first} ${person.last}`;
+                page.drawText(full, {
+                  x: ox + cWpts/2 - font.widthOfTextAtSize(full, smallFont)/2,
+                  y: oy + cHpts/4 - smallFont/2,
+                  size: smallFont, font
+                });
+              }
             }
           }
         }
+
+        const bytes = await pdfDoc.save();
+        const blob = new Blob([bytes],{type:'application/pdf'});
+        dlLink.href = URL.createObjectURL(blob);
+        dlLink.download = outputName;
+        dlLink.textContent = `Download ${outputName}`;
+        dlLink.classList.remove('hidden');
+
+        setTimeout(()=>{ try{ dlLink.click() }catch{} },50);
+        status.textContent = 'Ready!';
       }
-
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      dlLink.href = URL.createObjectURL(blob);
-      dlLink.download = outputName;
-      dlLink.textContent = `Download ${outputName}`;
-      dlLink.classList.remove('hidden');
-
-      setTimeout(() => { try { dlLink.click(); } catch {} }, 50);
-      status.textContent = 'Ready!';
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
-      status.textContent = '';
-    } finally {
-      genBtn.disabled = false;
-    }
-  });
-</script>
+      catch(err){
+        console.error(err);
+        alert(err.message);
+        status.textContent = '';
+      }
+      finally{ genBtn.disabled = false; }
+    });
+  </script>
+</body>
+</html>
