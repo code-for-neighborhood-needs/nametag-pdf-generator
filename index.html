@@ -1,112 +1,98 @@
+<!-- libs (fresh copy, cache-busted) -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js?v=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js?v=1"></script>
+
 <script>
-  const CM_TO_PT = 28.3464567;
-  const cm = v => v * CM_TO_PT;
+  const CM = 28.3464567, cm = v => v * CM;
 
-  
-  /* ---------- tiny helpers ---------- */
-  function autosizeFirstName(font, text, maxWidth, max, min) {
-    let size = max;
-    while (size >= min &&
-           font.widthOfTextAtSize(text, size) > maxWidth) size--;
-    return Math.max(size, min);
-  }
+  const log   = msg => console.log('[PDF-gen]', msg);
+  const error = msg => console.error('[PDF-gen]', msg);
 
-  /* ---------- main handler ---------- */
-  const form       = document.getElementById('generatorForm');
-  const statusTxt  = document.createElement('span');         // NEW
-  statusTxt.id     = 'status';
-  statusTxt.className = 'text-sm text-gray-500';
-  form.appendChild(statusTxt);                               // NEW
+  /* -------- main form ------------ */
+  const form   = document.getElementById('generatorForm');
+  const btn    = document.getElementById('generateBtn');
+  const link   = document.getElementById('downloadLink');
+  const notice = document.createElement('span');
+  notice.className = 'text-sm text-gray-500 ml-2';
+  btn.after(notice);
 
   form.addEventListener('submit', async ev => {
     ev.preventDefault();
-
-    const btn = document.getElementById('generateBtn');
-    btn.disabled = true;                                     // NEW
-    statusTxt.textContent = 'Generating… please wait';       // NEW
+    btn.disabled = true; notice.textContent = 'Generating…';
 
     try {
-      /* read fields -------------------------------------------------------- */
-      const get = id => document.getElementById(id).value.trim();
-      const group   = get('groupName');
-      const pdfName = (get('pdfName').replace(/\\.pdf$/i,'') || 'name_cards') + '.pdf';
+      /* --- read UI --- */
+      const val = id => document.getElementById(id).value.trim();
+      const ward   = val('groupName');
+      const pdfName= (val('pdfName').replace(/\\.pdf$/i,'') || 'name_cards') + '.pdf';
 
-      const pageW = +get('pageW'), pageH = +get('pageH');
-      const cardW = +get('cardW'), cardH = +get('cardH');
-      const fMax  = +get('fontMax'), fMin = +get('fontMin'), fSmall = +get('fontSmall');
+      const pageW=+val('pageW'), pageH=+val('pageH');
+      const cardW=+val('cardW'), cardH=+val('cardH');
+      const fMax =+val('fontMax'), fMin=+val('fontMin'), fSmall=+val('fontSmall');
 
-      /* roster ------------------------------------------------------------- */
+      /* --- CSV --- */
       const file = document.getElementById('csvInput').files[0];
-      if (!file) { alert('Choose a CSV first'); btn.disabled = false; return; }
+      if (!file) throw new Error('No CSV file chosen.');
 
       const rows = await new Promise(res => {
-        Papa.parse(file, { skipEmptyLines:true, complete: r => res(r.data) });
+        Papa.parse(file, { skipEmptyLines:true, complete:r=>res(r.data) });
       });
-      const names = rows.map(r => ({ first:r[1].trim(), last:r[0].trim() }));
+      const roster = rows.map(r => ({ first:(r[1]||'').trim(), last:(r[0]||'').trim() }))
+                         .filter(n => n.first && n.last);
+      if (!roster.length) throw new Error('CSV seems empty or badly-formatted.');
 
-      /* build PDF ---------------------------------------------------------- */
-      const { PDFDocument, StandardFonts, rgb } = PDFLib;
-      const pdf        = await PDFDocument.create();
-      const fontR      = await pdf.embedFont(StandardFonts.Helvetica);
-      const fontB      = await pdf.embedFont(StandardFonts.HelveticaBold);
+      /* --- PDF build --- */
+      const { PDFDocument, rgb, StandardFonts } = PDFLib;
+      const pdf   = await PDFDocument.create();
+      const font  = await pdf.embedFont(StandardFonts.Helvetica);
+      const bold  = await pdf.embedFont(StandardFonts.HelveticaBold);
 
-      const pageWidth  = cm(pageW),    pageHeight = cm(pageH);
-      const cardWidth  = cm(cardW),    cardHeight = cm(cardH);
-      const cols = 2, rowsPer = 2, perPage = cols * rowsPer;
+      const pW=cm(pageW), pH=cm(pageH), cW=cm(cardW), cH=cm(cardH);
+      const cols=2, rows=2, per=cols*rows;
 
-      names.forEach((n, i) => {
-        if (i % perPage === 0) pdf.addPage([pageWidth, pageHeight]);
-        const p   = pdf.getPage(pdf.getPageCount() - 1);
-        const pos = i % perPage, col = pos % cols, row = Math.floor(pos / cols);
-        const ox  = col * cardWidth, oy = pageHeight - (row + 1) * cardHeight;
+      const fit = (text,max)=>{          // quick inline autosize
+        let s=fMax; while(s>=fMin && bold.widthOfTextAtSize(text,s)>max) s--; return s;
+      };
 
-        /* outline */
-        p.drawRectangle({ x:ox, y:oy, width:cardWidth, height:cardHeight,
-                          borderWidth:1.5, borderColor:rgb(0,0,0),
-                          borderDashArray:[4,3], color:rgb(1,1,1), opacity:0 });
+      roster.forEach((n,i)=>{
+        if(i%per===0) pdf.addPage([pW,pH]);
+        const pg = pdf.getPage(pdf.getPageCount()-1);
+        const pos=i%per, col=pos%cols, row=Math.floor(pos/cols);
+        const ox=col*cW, oy=pH-(row+1)*cH;
 
-        /* corner label */
-        p.drawText(group, { x:ox+cm(0.5), y:oy+cardHeight-cm(0.5)-10,
-                            size:10, font:fontR });
+        pg.drawRectangle({x:ox,y:oy,width:cW,height:cH,borderWidth:1.5,
+                          borderColor:rgb(0,0,0),borderDashArray:[4,3],
+                          color:rgb(1,1,1),opacity:0});
 
-        /* first name */
-        const maxW   = cm(cardW - 2);
-        const fSize  = autosizeFirstName(fontB, n.first, maxW, fMax, fMin);
-        p.drawText(n.first, {
-          x: ox + cardWidth/2 - fontB.widthOfTextAtSize(n.first, fSize)/2,
-          y: oy + cardHeight/1.7 - fSize/2,
-          size: fSize, font: fontB
-        });
+        pg.drawText(ward,{x:ox+cm(0.5),y:oy+cH-cm(0.5)-10,size:10,font});
 
-        /* full name */
-        const full = n.first + ' ' + n.last;
-        p.drawText(full, {
-          x: ox + cardWidth/2 - fontR.widthOfTextAtSize(full, fSmall)/2,
-          y: oy + cardHeight/4 - fSmall/2,
-          size: fSmall, font: fontR
-        });
+        const size=fit(n.first,cm(cardW-2));
+        pg.drawText(n.first,{
+          x:ox+cW/2-bold.widthOfTextAtSize(n.first,size)/2,
+          y:oy+cH/1.7-size/2,size,font:bold});
+        const full=`${n.first} ${n.last}`;
+        pg.drawText(full,{
+          x:ox+cW/2-font.widthOfTextAtSize(full,fSmall)/2,
+          y:oy+cH/4-fSmall/2,size:fSmall,font});
       });
 
-      /* download ----------------------------------------------------------- */
-      const blob = new Blob([await pdf.save()], { type:'application/pdf' });
-      const url  = URL.createObjectURL(blob);
-
-      const link = document.getElementById('downloadLink');
-      link.href        = url;
-      link.download    = pdfName;
-      link.textContent = 'Download ' + pdfName;
+      /* --- download --- */
+      const blob=new Blob([await pdf.save()],{type:'application/pdf'});
+      link.href=URL.createObjectURL(blob);
+      link.download=pdfName;
+      link.textContent='Download '+pdfName;
       link.classList.remove('hidden');
 
-      link.click();                                          // NEW – auto-trigger
-      statusTxt.textContent = 'PDF ready!';                  // NEW
+      /* attempt auto-click; if blocked, user still sees link */
+      setTimeout(()=>{ try{ link.click(); }catch(e){ log('Auto-click blocked'); }},10);
+
+      notice.textContent=' PDF ready!';
     }
-    catch (err) {
-      console.error(err);
-      alert('Error while creating PDF – check the console for details.');
-      statusTxt.textContent = '';
+    catch(e){
+      error(e);
+      alert('Failed: '+e.message);
+      notice.textContent='';
     }
-    finally {
-      btn.disabled = false;                                  // NEW
-    }
+    finally{ btn.disabled=false; }
   });
 </script>
