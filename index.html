@@ -24,8 +24,7 @@
 
   <!-- Main heading -->
   <h1 class="text-3xl font-bold mb-6 text-center">Name-Card PDF Generator</h1>
-  <h1 class="text-3xl font-bold mb-6 text-center">You may need to disable browser extensions before using</h1>
-  <h1 class="text-3xl font-bold mb-6 text-center">See Advanced Options for more implementations</h1>
+  <h1 class="text-3xl font-bold mb-6 text-center">WARNING: disable browser extensions before using</h1>
   <form id="genForm" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
     <!-- Basic Settings -->
     <label class="block">
@@ -172,7 +171,7 @@
         const font     = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const bold     = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-        // Convert dimensions from cm → points
+        // Convert page/card dimensions from cm → points
         const ptsW = cm(pageW), ptsH = cm(pageH);
         const cWpts = cm(cardW), cHpts = cm(cardH);
 
@@ -180,22 +179,25 @@
         const columns = 2, rowsPerPage = 2, cardsPerPage = columns * rowsPerPage;
         const totalPages = Math.ceil(people.length / cardsPerPage);
 
+        // Compute total grid size (for centering)
+        const gridWidth = columns * cWpts + (columns - 1) * spacingPts;
+        const gridHeight = rowsPerPage * cHpts + (rowsPerPage - 1) * spacingPts;
+        // Offsets to center the grid on each page
+        const xOffset = (ptsW - gridWidth) / 2;
+        const yOffset = (ptsH - gridHeight) / 2;
+
         for (let p = 0; p < totalPages; p++) {
           pdfDoc.addPage([ptsW, ptsH]);
           const page = pdfDoc.getPage(p);
 
-          // Compute horizontal/vertical “pitch” (card size + spacing)
-          const horizontalPitch = cWpts + spacingPts;
-          // For vertical pitch, we’ll handle spacing in the Y offset calculation
-
           for (let r = 0; r < rowsPerPage; r++) {
             for (let c = 0; c < columns; c++) {
               const idx = p * cardsPerPage + r * columns + c;
-              // X‐origin = column index × (card width + spacing)
-              const ox = c * horizontalPitch;
-              // Y‐origin = top of page minus 
-              //   [(r+1)×card height] minus [r×spacing]
-              const oy = ptsH - ((r + 1) * cHpts + r * spacingPts);
+              // Compute X-origin with centering + horizontal spacing
+              const ox = xOffset + c * (cWpts + spacingPts);
+              // Compute Y-origin: page top minus the vertical offset of this card
+              // (r * (cHpts + spacingPts) + cardHeight) then minus yOffset
+              const oy = ptsH - yOffset - ((r + 1) * cHpts + r * spacingPts);
 
               // Draw card outline (dashed border)
               page.drawRectangle({
@@ -243,7 +245,7 @@
                   effectiveMinFont
                 );
 
-                // After auto‐sizing by width, also cap by 40% of card height
+                // After auto-sizing by width, also cap by 40% of card height
                 const heightCap = cHpts * 0.4;
                 if (nameSize > heightCap) {
                   nameSize = Math.floor(heightCap);
