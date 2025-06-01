@@ -210,7 +210,7 @@
                 // ***** UPDATED: shrink “maxFont” up front if name is > 10 chars *****
                 let effectiveMaxFont = maxFont;
                 const threshold = 10;
-                const shrinkFactor = 0.5; // halve the maxFont for long names
+                const shrinkFactor = 0.3; // halve the maxFont for long names
                 if (person.first.length > threshold) {
                   effectiveMaxFont = Math.floor(maxFont * shrinkFactor);
                 }
