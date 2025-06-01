@@ -24,7 +24,7 @@
 
   <!-- Main heading -->
   <h1 class="text-3xl font-bold mb-6 text-center">Name-Card PDF Generator</h1>
-  <h1 class="text-3xl font-bold mb-6 text-center">Disable browser extensions before using</h1>
+  <h1 class="text-3xl font-bold mb-6 text-center">WARNING: disable browser extensions before using</h1>
   <form id="genForm" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
     <!-- Basic Settings -->
     <label class="block">
@@ -207,16 +207,24 @@
                 // Determine name size, capping at 40% of card height
                 const maxTextW = cm(cardW - 2);
 
-                // ***** UPDATED: shrink “maxFont” up front if name is > 10 chars *****
+                // ***** NEW: shrink BOTH maxFont & minFont by 50% if first name (including spaces) > 10 characters
                 let effectiveMaxFont = maxFont;
+                let effectiveMinFont = minFont;
                 const threshold = 10;
-                const shrinkFactor = 0.3; // halve the maxFont for long names
+                const shrinkFactor = 0.5; // cut both maxFont & minFont in half
                 if (person.first.length > threshold) {
                   effectiveMaxFont = Math.floor(maxFont * shrinkFactor);
+                  effectiveMinFont = Math.floor(minFont * shrinkFactor);
                 }
 
-                // Compute size via autoSize() using the adjusted maxFont
-                let nameSize = autoSize(bold, person.first, maxTextW, effectiveMaxFont, minFont);
+                // Compute size via autoSize() using the adjusted max/min
+                let nameSize = autoSize(
+                  bold,
+                  person.first,
+                  maxTextW,
+                  effectiveMaxFont,
+                  effectiveMinFont
+                );
 
                 // After auto‐sizing by width, also cap by 40% of card height
                 const heightCap = cHpts * 0.4;
