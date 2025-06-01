@@ -24,7 +24,8 @@
 
   <!-- Main heading -->
   <h1 class="text-3xl font-bold mb-6 text-center">Name-Card PDF Generator</h1>
-  <h1 class="text-3xl font-bold mb-6 text-center">WARNING: disable browser extensions before using</h1>
+  <h1 class="text-3xl font-bold mb-6 text-center">You may need to disable browser extensions before using</h1>
+  <h1 class="text-3xl font-bold mb-6 text-center">See Advanced Options for more implementations</h1>
   <form id="genForm" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
     <!-- Basic Settings -->
     <label class="block">
@@ -70,6 +71,11 @@
         <label>
           <span class="text-gray-700">Card height (cm)</span>
           <input id="cardH" type="number" step="0.1" value="7.5"
+                 class="mt-1 p-1 w-full rounded-md border-gray-300"/>
+        </label>
+        <label>
+          <span class="text-gray-700">Card spacing (cm)</span>
+          <input id="spacing" type="number" step="0.1" value="0"
                  class="mt-1 p-1 w-full rounded-md border-gray-300"/>
         </label>
         <label>
@@ -141,7 +147,11 @@
 
         const pageW    = +v('pageW'), pageH    = +v('pageH');
         const cardW    = +v('cardW'), cardH    = +v('cardH');
+        const spacingCm = +v('spacing');
         const maxFont  = +v('maxFont'), minFont  = +v('minFont'), smallFont = +v('smallFont');
+
+        // Convert spacing from cm → points
+        const spacingPts = cm(spacingCm);
 
         // Ensure a CSV file was selected
         const file = document.getElementById('csvFile').files[0];
@@ -162,7 +172,7 @@
         const font     = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const bold     = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-        // Convert dimensions from cm to points
+        // Convert dimensions from cm → points
         const ptsW = cm(pageW), ptsH = cm(pageH);
         const cWpts = cm(cardW), cHpts = cm(cardH);
 
@@ -174,11 +184,18 @@
           pdfDoc.addPage([ptsW, ptsH]);
           const page = pdfDoc.getPage(p);
 
+          // Compute horizontal/vertical “pitch” (card size + spacing)
+          const horizontalPitch = cWpts + spacingPts;
+          // For vertical pitch, we’ll handle spacing in the Y offset calculation
+
           for (let r = 0; r < rowsPerPage; r++) {
             for (let c = 0; c < columns; c++) {
               const idx = p * cardsPerPage + r * columns + c;
-              const ox = c * cWpts;
-              const oy = ptsH - (r + 1) * cHpts;
+              // X‐origin = column index × (card width + spacing)
+              const ox = c * horizontalPitch;
+              // Y‐origin = top of page minus 
+              //   [(r+1)×card height] minus [r×spacing]
+              const oy = ptsH - ((r + 1) * cHpts + r * spacingPts);
 
               // Draw card outline (dashed border)
               page.drawRectangle({
@@ -207,17 +224,17 @@
                 // Determine name size, capping at 40% of card height
                 const maxTextW = cm(cardW - 2);
 
-                // ***** NEW: shrink BOTH maxFont & minFont by 50% if first name (including spaces) > 10 characters
+                // If first name is > 10 characters, shrink both maxFont & minFont by 50%
                 let effectiveMaxFont = maxFont;
                 let effectiveMinFont = minFont;
                 const threshold = 10;
-                const shrinkFactor = 0.5; // cut both maxFont & minFont in half
+                const shrinkFactor = 0.5; // half for anything longer than 10 chars
                 if (person.first.length > threshold) {
                   effectiveMaxFont = Math.floor(maxFont * shrinkFactor);
                   effectiveMinFont = Math.floor(minFont * shrinkFactor);
                 }
 
-                // Compute size via autoSize() using the adjusted max/min
+                // Compute size via autoSize() using adjusted max/min
                 let nameSize = autoSize(
                   bold,
                   person.first,
