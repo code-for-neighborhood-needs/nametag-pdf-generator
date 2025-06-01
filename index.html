@@ -207,14 +207,15 @@
                 // Determine name size, capping at 40% of card height
                 const maxTextW = cm(cardW - 2);
 
-                // *** NEW: if the first name is longer than 10 chars, shrink the "maxFont" used for autoSize ***
-                let threshold = 10;           // e.g. 10 characters
-                let shrinkFactor = 0.8;       // reduce maxFont by 20% whenever length > threshold
+                // ***** UPDATED: shrink “maxFont” up front if name is > 10 chars *****
                 let effectiveMaxFont = maxFont;
+                const threshold = 10;
+                const shrinkFactor = 0.5; // halve the maxFont for long names
                 if (person.first.length > threshold) {
                   effectiveMaxFont = Math.floor(maxFont * shrinkFactor);
                 }
 
+                // Compute size via autoSize() using the adjusted maxFont
                 let nameSize = autoSize(bold, person.first, maxTextW, effectiveMaxFont, minFont);
 
                 // After auto‐sizing by width, also cap by 40% of card height
