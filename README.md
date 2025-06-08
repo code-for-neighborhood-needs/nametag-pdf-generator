@@ -17,12 +17,12 @@ Made with vibe coding.
 
 Here's an example, using the following input:
 ```
-Brien, Stuart
-Brien, Earl
+Doe, Jane
+Doe, John
 ```
 The organization name was changes from ``Provo YSA 19th Ward`` to ``Random Organization``.
+![image](https://github.com/user-attachments/assets/801a0618-39d9-43c3-abf8-eb417d7ed7bb)
 
-![image](https://github.com/user-attachments/assets/e692c958-4457-4ddc-a5d0-ef5c8624de33)
 
 Note that two extra boxes were made.
 
