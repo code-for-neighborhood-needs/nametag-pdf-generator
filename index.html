@@ -23,7 +23,11 @@
 <body class="bg-gray-50 min-h-screen flex flex-col items-center py-10">
 
   <!-- Main heading -->
-  <h1 class="text-3xl font-bold mb-6 text-center">Name-Card PDF Generator</h1>
+  <h1 class="text-3xl font-bold mb-2 text-center">Name-Card PDF Generator</h1>
+  <!-- Instruction link -->
+  <p class="text-sm text-gray-600 mb-6 text-center">
+    See <a href="https://github.com/code-for-neighborhood-needs/nametag-pdf-generator/tree/main" target="_blank" class="text-blue-600 underline">this link</a> for more instructions.
+  </p>
 
   <form id="genForm" class="w-full max-w-3xl grid gap-4 bg-white p-6 rounded-2xl shadow">
     <!-- Input Mode Selection -->
@@ -73,7 +77,6 @@ Doe, John</textarea>
     <details>
       <summary class="cursor-pointer font-medium">Advanced layout</summary>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
-        <!-- existing layout fields unchanged -->
         <label>
           <span class="text-gray-700">Page width (cm)</span>
           <input id="pageW" type="number" step="0.1" value="29.7"
@@ -213,72 +216,4 @@ Doe, John</textarea>
         const { PDFDocument, rgb, StandardFonts } = PDFLib;
         const pdfDoc = await PDFDocument.create();
         const font     = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const bold     = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-        // Points conversion
-        const ptsW = cm(pageW), ptsH = cm(pageH);
-        const cWpts = cm(cardW), cHpts = cm(cardH);
-
-        const columns = 2, rowsPerPage = 2;
-        const cardsPerPage = columns * rowsPerPage;
-        const totalPages = Math.ceil(people.length / cardsPerPage);
-
-        const gridWidth = columns * cWpts + (columns - 1) * spacingPts;
-        const gridHeight= rowsPerPage * cHpts + (rowsPerPage - 1) * spacingPts;
-        const xOffset = (ptsW - gridWidth) / 2;
-        const yOffset = (ptsH - gridHeight) / 2;
-
-        for (let p = 0; p < totalPages; p++) {
-          pdfDoc.addPage([ptsW, ptsH]);
-          const page = pdfDoc.getPage(p);
-          for (let r = 0; r < rowsPerPage; r++) {
-            for (let c = 0; c < columns; c++) {
-              const idx = p * cardsPerPage + r * columns + c;
-              const ox = xOffset + c * (cWpts + spacingPts);
-              const oy = ptsH - yOffset - ((r + 1) * cHpts + r * spacingPts);
-
-              page.drawRectangle({ x: ox, y: oy, width: cWpts, height: cHpts,
-                                 borderWidth: 1.5, borderColor: rgb(0,0,0), borderDashArray: [4,3] });
-
-              if (idx < people.length) {
-                const person = people[idx];
-                page.drawText(ward, { x: ox+cm(0.5), y: oy+cHpts-cm(0.5)-10, size:10, font });
-
-                let effectiveMax = maxFont, effectiveMin = minFont;
-                if (person.first.length > 10) {
-                  effectiveMax = Math.floor(maxFont*0.5);
-                  effectiveMin = Math.floor(minFont*0.5);
-                }
-                let nameSize = autoSize(bold, person.first, cm(cardW-2), effectiveMax, effectiveMin);
-                if (nameSize > cHpts*0.4) nameSize = Math.floor(cHpts*0.4);
-                const textWidth = bold.widthOfTextAtSize(person.first, nameSize);
-                page.drawText(person.first, { x: ox+cWpts/2-textWidth/2, y: oy+cHpts/1.7-nameSize/2,
-                                              size:nameSize, font:bold });
-                const full = `${person.first} ${person.last}`;
-                const smallW= font.widthOfTextAtSize(full, smallFont);
-                page.drawText(full, { x: ox+cWpts/2-smallW/2, y: oy+cHpts/4-smallFont/2,
-                                      size:smallFont, font });
-              }
-            }
-          }
-        }
-
-        const bytes = await pdfDoc.save();
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        dlLink.href = URL.createObjectURL(blob);
-        dlLink.download = outputName;
-        dlLink.textContent = `Download ${outputName}`;
-        dlLink.classList.remove('hidden');
-        setTimeout(() => { try { dlLink.click(); } catch {} }, 50);
-        status.textContent = 'Ready!';
-      } catch (err) {
-        console.error(err);
-        alert(err.message);
-        status.textContent = '';
-      } finally {
-        genBtn.disabled = false;
-      }
-    });
-  </script>
-</body>
-</html>
+        const bold     = await pdfDoc.embedFont(StandardFonts.HelveticaBol
