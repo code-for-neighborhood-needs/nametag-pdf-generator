@@ -6,9 +6,9 @@ Made with vibe coding.
 2. Do one of two things:
    - Upload a csv file of the format (lastname, firstname).
    - Paste all names in the format (lastname, firstname) as seen in the example on the Github.io website.
-4. (Optional) Change the organization from the default ``Provo YSA 19th Ward`` to your preferred organization.
-5. Change any advanced features you would prefer (e.g. distance between cards, font size, etc.)
-6. Click the download button
+3. (Optional) Change the organization from the default ``Provo YSA 19th Ward`` to your organization's name.
+4. Change any advanced features you would prefer (e.g. distance between cards, font size, etc.)
+5. Click the download button
 
 
 
