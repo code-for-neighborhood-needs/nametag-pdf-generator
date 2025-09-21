@@ -33,7 +33,8 @@ Doe, Jane
 Doe, John
 ```
 The organization name was changes from ``Provo YSA 19th Ward`` to ``Random Organization``.
-![image](https://github.com/user-attachments/assets/801a0618-39d9-43c3-abf8-eb417d7ed7bb)
+<img width="815" height="636" alt="image" src="https://github.com/user-attachments/assets/d0b1bd9b-6d70-45e9-b328-afdefa57db69" />
+
 
 
 Note that two extra boxes were made.
