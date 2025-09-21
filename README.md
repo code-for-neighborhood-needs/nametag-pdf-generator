@@ -32,7 +32,7 @@ Here's an example, using the following input:
 Doe, Jane
 Doe, John
 ```
-The organization name was changes from ``Provo YSA 19th Ward`` to ``Random Organization``.
+The organization name was changed from ``Provo YSA 19th Ward`` to ``Random Organization``.
 <img width="815" height="636" alt="image" src="https://github.com/user-attachments/assets/d0b1bd9b-6d70-45e9-b328-afdefa57db69" />
 
 
