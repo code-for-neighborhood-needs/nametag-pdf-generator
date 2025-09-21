@@ -4,7 +4,7 @@ Made with vibe coding.
 
 | Name       | Amount               | Where to Purchase                                                                                                                                                                                                                                                                |
 | ---------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Name Tags  | N                    | [Plastic Name Tags (50 ct)](https://www.amazon.com/dp/B09LHXV7XR?ref_=icdp_ba_mweb_mb_pd_bap_m_grid_rp_0_15_gf&clientRefMarker=pd_bap_m_grid_rp_0_15_gf&heartsTeamIdentifier=buyagain&psc=1&heartDisabled=false) – \$50 / 50 name tags                                           |
+| Name Tags  | N                    | [Plastic Name Tags (50 ct)](https://www.amazon.com/dp/B09LHXV7XR?ref_=icdp_ba_mweb_mb_pd_bap_m_grid_rp_0_15_gf&clientRefMarker=pd_bap_m_grid_rp_0_15_gf&heartsTeamIdentifier=buyagain&psc=1&heartDisabled=false) – \$50 / 50 name tags (NOTE: Consider also clip-on nametags)                                         |
 | Copy Paper | ⌈N / 4⌉ (rounded up) | [AmazonBasics Multipurpose Copy/Printer Paper](https://www.amazon.com/AmazonBasics-Multipurpose-Copy-Printer-Paper/dp/B01FV0F5HG?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&smid=ATVPDKIKX0DER&gPromoCode=sns_us_en_5_2025Q1&gQT=1&th=1) – ≈ \$0.10 / page (≈ \$0.10 × N / 4) |
 
 * **N** means *Number of people to print nametags for*
